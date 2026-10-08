@@ -1,26 +1,18 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/*
+  Thème MaisonFawzeyni.
+  Chaque couleur déclarée ici crée automatiquement des classes Tailwind :
+  --color-bleu → bg-bleu, text-bleu, border-bleu…
+  Le design system complet (textes, fonds clairs, typographies) viendra à l'étape 13.
+*/
+@theme {
+  /* Les deux couleurs du logo */
+  --color-bleu: #1b5289;
+  --color-or: #d2ae60;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: white;
+  color: #12233a;
 }

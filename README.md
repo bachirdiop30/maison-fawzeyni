@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MaisonFawzeyni
 
-## Getting Started
+Boutique en ligne de boubous traditionnels sénégalais : catalogue, panier, commande, paiement (Wave, Orange Money) et espace d'administration pour le gérant.
 
-First, run the development server:
+Le cahier des charges complet est dans [`PROJET.md`](PROJET.md).
+
+## Technologies
+
+- **Next.js 16** (App Router) + **React 19** + **TypeScript** : les pages et l'API, dans un seul projet
+- **Tailwind CSS 4** : le style, avec le thème de la marque dans `src/app/globals.css`
+- **PostgreSQL** (hébergé chez [Neon](https://neon.tech)) + **Prisma** : la base de données (à venir)
+
+## Installer le projet
+
+Prérequis : Node.js 20 ou plus récent, Git.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install                 # télécharge les bibliothèques dans node_modules/
+cp .env.example .env        # puis remplir les valeurs dans .env (sous PowerShell : Copy-Item .env.example .env)
+npm run dev                 # lance le site sur http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Commandes
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Commande | Rôle |
+|---|---|
+| `npm run dev` | serveur de développement, rechargé à chaque modification |
+| `npm run build` | fabrique la version de production et vérifie TypeScript |
+| `npm run start` | lance la version fabriquée par `build` |
+| `npm run lint` | vérifie le code avec ESLint |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Organisation du code
 
-## Learn More
+```
+src/
+├── app/          Les pages et l'API. Un dossier = une adresse du site.
+├── components/   Les morceaux d'interface réutilisables (Logo, boutons, cartes…)
+├── config/       Les réglages de la boutique (nom, coordonnées…)
+├── lib/          Les fonctions utilitaires pures, sans affichage (format des prix…)
+└── server/       La logique métier, exécutée uniquement sur le serveur
+                  (calcul des commandes, paiements, accès à la base)
+```
 
-To learn more about Next.js, take a look at the following resources:
+Règle principale : **les pages affichent, le serveur décide.** Un prix, un total ou un statut de paiement est toujours calculé ou vérifié dans `src/server/`, jamais dans le navigateur.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Variables d'environnement
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+La liste des variables nécessaires est dans [`.env.example`](.env.example). Les vraies valeurs vont dans `.env`, qui n'est jamais envoyé sur Git.
