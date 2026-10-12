@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { site } from "@/config/site";
 
@@ -11,6 +12,12 @@ export default function Home() {
         <h1 className="text-2xl tracking-wide text-or">{site.name}</h1>
         <p className="text-white/80">Site en construction (Sante rek)...</p>
       </div>
+      <Link
+        href="/catalogue"
+        className="inline-flex min-h-11 items-center border border-or px-6 text-or transition-colors hover:bg-or hover:text-bleu focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-or"
+      >
+        Voir les modèles
+      </Link>
     </main>
   );
 }

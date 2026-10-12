@@ -4,7 +4,8 @@ import "./globals.css";
 
 // Titre et description lus par Google et affichés dans l'onglet du navigateur.
 export const metadata: Metadata = {
-  title: site.name,
+  // Sur chaque page : « Nos modèles · MaisonFawzeyni »
+  title: { default: site.name, template: `%s · ${site.name}` },
   description: site.description,
 };
 

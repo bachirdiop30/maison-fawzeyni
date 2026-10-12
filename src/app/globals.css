@@ -10,9 +10,12 @@
   /* Les deux couleurs du logo */
   --color-bleu: #1b5289;
   --color-or: #d2ae60;
+
+  /* Le texte courant : un bleu presque noir, plus doux que le noir pur */
+  --color-encre: #12233a;
 }
 
 body {
   background-color: white;
-  color: #12233a;
+  color: var(--color-encre);
 }
