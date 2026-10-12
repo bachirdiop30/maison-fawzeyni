@@ -14,7 +14,7 @@ export default function CataloguePage() {
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-12 sm:px-6 sm:py-16">
       <header className="mb-10 max-w-xl sm:mb-14">
-        <h1 className="text-4xl font-light tracking-tight text-bleu sm:text-5xl">Nos modèles</h1>
+        <h1 className="font-display text-4xl text-bleu sm:text-5xl">Nos modèles</h1>
         <p className="mt-4 leading-relaxed text-encre/75">
           Chaque pièce est cousue sur mesure. Choisissez un modèle, une formule et votre couleur :
           nous nous occupons du reste.
@@ -52,7 +52,7 @@ async function CatalogueGrid() {
               />
             )}
           </div>
-          <h2 className="mt-4 text-lg leading-snug">{item.name}</h2>
+          <h2 className="mt-4 font-display text-xl leading-snug">{item.name}</h2>
           <p className="mt-1 text-sm text-encre/65">
             {item.category} · {item.colorCount} couleur{item.colorCount > 1 ? "s" : ""}
           </p>

@@ -1,21 +1,58 @@
 @import "tailwindcss";
 
 /*
-  Thème MaisonFawzeyni.
-  Chaque couleur déclarée ici crée automatiquement des classes Tailwind :
-  --color-bleu → bg-bleu, text-bleu, border-bleu…
-  Le design system complet (textes, fonds clairs, typographies) viendra à l'étape 13.
+  Design system MaisonFawzeyni.
+  Chaque variable déclarée ici crée automatiquement des classes Tailwind :
+  --color-bleu → bg-bleu, text-bleu, border-bleu…   --font-display → font-display
+
+  Contrastes mesurés (minimum exigé : 4,5 pour du texte courant, 3 pour un grand titre) :
+  - or sur nuit : 6,4   → l'or peut servir pour du petit texte sur fond nuit
+  - or sur bleu : 3,8   → sur fond bleu, l'or est réservé aux grands titres et au décor
+  - or sur ivoire : 1,9 → JAMAIS de texte or sur fond clair : utiliser or-fonce (5,3)
+  - bleu sur ivoire : 7,2 · encre sur ivoire : 14,2 · gris sur ivoire : 5,2
 */
 @theme {
-  /* Les deux couleurs du logo */
+  /* Les couleurs du logo */
   --color-bleu: #1b5289;
   --color-or: #d2ae60;
 
-  /* Le texte courant : un bleu presque noir, plus doux que le noir pur */
-  --color-encre: #12233a;
+  /* Leurs déclinaisons */
+  --color-nuit: #0e2f55; /* bleu profond : fonds sombres, survol des boutons bleus */
+  --color-or-fonce: #7d5f22; /* l'or lisible sur fond clair */
+
+  /* Les neutres */
+  --color-ivoire: #f6f2ea; /* fond clair chaleureux, comme un tissu écru */
+  --color-encre: #12233a; /* le texte courant : un bleu presque noir */
+  --color-gris: #5b6675; /* le texte secondaire */
+
+  /* Animations (déclenchées seulement par une action du visiteur) */
+  --animate-menu-in: menu-in 0.45s ease-out both;
+
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+  }
+}
+
+/* Les polices sont chargées dans layout.tsx ; on les branche ici sur Tailwind. */
+@theme inline {
+  --font-sans: var(--font-jost); /* texte, navigation, boutons, prix */
+  --font-display: var(--font-bodoni); /* grands titres et noms des modèles */
 }
 
 body {
   background-color: white;
   color: var(--color-encre);
+}
+
+/* Les personnes qui ont réduit les animations dans les réglages de leur téléphone n'en ont aucune. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

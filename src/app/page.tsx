@@ -10,7 +10,7 @@ export default function Home() {
       <Logo className="w-28 text-or sm:w-36" />
       <div className="space-y-3">
         <h1 className="text-2xl tracking-wide text-or">{site.name}</h1>
-        <p className="text-white/80">Site en construction (Sante rek)...</p>
+        <p className="text-white/80">Sante rek...</p>
       </div>
       <Link
         href="/catalogue"

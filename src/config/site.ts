@@ -3,5 +3,14 @@
 export const site = {
   name: "MaisonFawzeyni",
   description: "Boubous traditionnels sénégalais, pensés et confectionnés par MaisonFawzeyni.",
+  tagline: "L'élégance en héritage",
   locale: "fr",
+
+  // Contact (numéros publiés sur Instagram)
+  whatsapp: "221784303944", // format international, sans « + » ni espaces : utilisé dans les liens wa.me
+  phones: ["78 430 39 44", "76 538 39 44"],
+  instagram: "https://www.instagram.com/_lamaisonfawzeyni/",
 } as const;
+
+// Les liens du menu principal. Une page n'apparaît ici que lorsqu'elle existe.
+export const mainNav = [{ label: "Nos modèles", href: "/catalogue" }] as const;
