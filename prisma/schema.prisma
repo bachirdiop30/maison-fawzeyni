@@ -37,6 +37,27 @@ model Product {
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
 
+  formulas Formula[] // un modèle se vend en plusieurs formules
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Ce que le client achète vraiment : une formule tissu + couture d'un modèle.
+// Ex. Baye Sonhibou — « 6 m de Getzner dont 2 m de Kaala + couture » — 85 000 FCFA.
+model Formula {
+  id          String  @id @default(cuid())
+  name        String // « Formule 2 »
+  description String // « 6 m de Getzner dont 2 m de Kaala assorti + couture sur mesure »
+  priceFcfa   Int // prix de vente au client, en FCFA (nombre entier : pas de centimes)
+  costFcfa    Int // coût pour MaisonFawzeyni (tissu + couture). JAMAIS montré au client.
+  position    Int     @default(0) // ordre d'affichage sur la fiche du modèle
+  isActive    Boolean @default(true)
+
+  // Le lien vers le modèle : chaque formule appartient à UN modèle.
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
