@@ -12,6 +12,8 @@ export default defineConfig({
   // Où ranger l'historique des modifications de la base (les migrations).
   migrations: {
     path: "prisma/migrations",
+    // Commande lancée par `npx prisma db seed` : remplit la base avec les données de démonstration.
+    seed: "tsx prisma/seed.ts",
   },
 
   // Les commandes Prisma modifient la structure de la base :
