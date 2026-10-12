@@ -38,6 +38,7 @@ model Product {
   category   Category @relation(fields: [categoryId], references: [id])
 
   formulas Formula[] // un modèle se vend en plusieurs formules
+  images   ProductImage[] // et a plusieurs photos
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -60,4 +61,20 @@ model Formula {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Une photo d'un modèle.
+// `url` peut être un fichier du site (« /images/produits/baye-sonhibou-1.jpg »)
+// ou une adresse en ligne : remplacer une photo = changer cette valeur, pas le code.
+model ProductImage {
+  id       String @id @default(cuid())
+  url      String
+  alt      String // description de la photo, lue par Google et par les lecteurs d'écran
+  position Int    @default(0) // 0 = photo principale, puis l'ordre de la galerie
+
+  // Si un modèle est supprimé, ses photos le sont aussi (Cascade).
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 }
