@@ -1,6 +1,6 @@
 // Description de la base de données de MaisonFawzeyni.
 // Chaque « model » deviendra un tableau dans PostgreSQL.
-// Les modèles (Product, Order, Customer...) seront ajoutés à l'étape 10.
+// Après chaque modification : `npx prisma migrate dev --name <nom-du-changement>`.
 
 // Ce que Prisma doit fabriquer : un client TypeScript, rangé dans src/generated/prisma.
 generator client {
@@ -11,4 +11,32 @@ generator client {
 // Le type de base de données. Son adresse est dans prisma.config.ts (lue depuis .env).
 datasource db {
   provider = "postgresql"
+}
+
+// Une catégorie du catalogue : Homme, et plus tard Femme.
+model Category {
+  id        String    @id @default(cuid())
+  name      String // « Homme »
+  slug      String    @unique // « homme », utilisé dans l'adresse : /homme
+  position  Int       @default(0) // ordre d'affichage dans le menu
+  products  Product[] // une catégorie contient plusieurs modèles
+  createdAt DateTime  @default(now())
+}
+
+// Un modèle de vêtement : Baye Sonhibou, Turki Njaareem...
+// Le prix n'est pas ici : il dépend de la formule choisie (tableau ajouté à l'étape suivante).
+model Product {
+  id          String   @id @default(cuid())
+  name        String // « Baye Sonhibou »
+  slug        String   @unique // « baye-sonhibou », utilisé dans l'adresse
+  description String
+  colors      String[] // couleurs proposées : ["Bleu", "Blanc", "Noir"]
+  isActive    Boolean  @default(true) // false = caché du site, mais gardé pour l'historique
+
+  // Le lien vers la catégorie : chaque modèle appartient à UNE catégorie.
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

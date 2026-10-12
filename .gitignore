@@ -40,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# photos de travail (captures Instagram, références) : pas sur Git
+/photo-reference/
+
+# client Prisma : fabriqué par `npx prisma generate`, jamais modifié à la main
+/src/generated/
