@@ -1,0 +1,14 @@
+// Description de la base de données de MaisonFawzeyni.
+// Chaque « model » deviendra un tableau dans PostgreSQL.
+// Les modèles (Product, Order, Customer...) seront ajoutés à l'étape 10.
+
+// Ce que Prisma doit fabriquer : un client TypeScript, rangé dans src/generated/prisma.
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// Le type de base de données. Son adresse est dans prisma.config.ts (lue depuis .env).
+datasource db {
+  provider = "postgresql"
+}
