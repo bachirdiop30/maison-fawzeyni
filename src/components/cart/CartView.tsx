@@ -1,17 +1,12 @@
 // Le contenu de la page Panier : les lignes, les quantités, le total.
 // Composant client : le panier est stocké dans le navigateur (voir lib/cart.ts).
-//
-// Provisoire : en attendant la page de commande et le paiement (phase 5),
-// « Commander » envoie le récapitulatif du panier sur WhatsApp. C'est une vraie commande.
 "use client";
 
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/Button";
-import { site } from "@/config/site";
 import { type CartLine, MAX_QUANTITY, cartSubtotal, removeFromCart, setQuantity, useCart } from "@/lib/cart";
 import { formatFcfa } from "@/lib/money";
-import { whatsappLink } from "@/lib/whatsapp";
 
 export function CartView() {
   const lines = useCart();
@@ -33,15 +28,6 @@ export function CartView() {
   }
 
   const subtotal = cartSubtotal(lines);
-
-  const message = [
-    "Bonjour MaisonFawzeyni, je souhaite commander :",
-    ...lines.map(
-      (line) =>
-        `- ${line.quantity} × ${line.name}, ${line.formulaName}${line.color ? `, ${line.color}` : ""} (${formatFcfa(line.priceFcfa)})`,
-    ),
-    `Total : ${formatFcfa(subtotal)}`,
-  ].join("\n");
 
   return (
     <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-16">
@@ -69,16 +55,11 @@ export function CartView() {
             </div>
           </dl>
 
-          <a
-            href={whatsappLink(site.whatsapp, message)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 flex min-h-12 w-full items-center justify-center bg-bleu px-6 text-[0.95rem] font-medium tracking-wide text-white transition-colors hover:bg-nuit focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-bleu"
-          >
-            Commander sur WhatsApp
-          </a>
+          <Button href="/commande" className="mt-6 w-full">
+            Passer commande
+          </Button>
           <p className="mt-4 text-xs leading-relaxed text-gris">
-            Nous confirmons avec vous vos mesures, la livraison et le paiement (Wave, Orange Money).
+            Paiement par Wave ou Orange Money. Nous confirmons ensuite vos mesures sur WhatsApp.
           </p>
         </div>
       </aside>

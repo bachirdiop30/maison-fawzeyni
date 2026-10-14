@@ -37,8 +37,9 @@ model Product {
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
 
-  formulas Formula[] // un modèle se vend en plusieurs formules
-  images   ProductImage[] // et a plusieurs photos
+  formulas   Formula[] // un modèle se vend en plusieurs formules
+  images     ProductImage[] // et a plusieurs photos
+  orderItems OrderItem[] // les fois où il a été commandé
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -59,6 +60,8 @@ model Formula {
   productId String
   product   Product @relation(fields: [productId], references: [id])
 
+  orderItems OrderItem[] // les fois où cette formule a été commandée
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -77,4 +80,118 @@ model ProductImage {
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────
+// Commandes et paiements
+// ─────────────────────────────────────────────────────────────
+
+// Un client. Pas de compte ni de mot de passe : il est reconnu à son numéro de téléphone.
+// S'il commande une 2e fois avec le même numéro, ses commandes sont regroupées.
+model Customer {
+  id        String  @id @default(cuid())
+  firstName String
+  lastName  String
+  phone     String  @unique // « 221784303944 », sans espaces : une seule fiche par numéro
+  orders    Order[] // un client peut passer plusieurs commandes
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Les listes de valeurs autorisées (« enum ») : la base refuse toute autre valeur.
+enum PaymentMethod {
+  WAVE
+  ORANGE_MONEY
+}
+
+enum PaymentStatus {
+  PENDING // en attente : le client n'a pas encore payé
+  PAID // payé, CONFIRMÉ par le serveur
+  FAILED // échoué ou annulé
+}
+
+enum DeliveryStatus {
+  PENDING // reçue, pas encore commencée
+  IN_PROGRESS // mesures prises, en confection
+  SHIPPED // en route
+  DELIVERED // livrée
+  CANCELLED // annulée
+}
+
+// Une commande. Elle garde une copie de l'adresse : si le client déménage plus tard,
+// l'adresse de cette commande-ci ne change pas.
+model Order {
+  id     String @id @default(cuid())
+  number Int    @unique @default(autoincrement()) // 1, 2, 3… affiché « MF-0001 »
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  // Livraison
+  address       String
+  city          String
+  deliveryNotes String? // « ? » = facultatif : « sonner au 2e étage »…
+
+  // Montants calculés PAR LE SERVEUR, en FCFA
+  subtotalFcfa    Int // somme des lignes
+  deliveryFeeFcfa Int @default(0)
+  totalFcfa       Int // subtotal + livraison : ce que le client doit payer
+
+  paymentMethod  PaymentMethod
+  paymentStatus  PaymentStatus  @default(PENDING) // résumé, mis à jour par les paiements
+  deliveryStatus DeliveryStatus @default(PENDING)
+
+  items    OrderItem[] // une commande contient une ou plusieurs lignes
+  payments Payment[] // et une ou plusieurs tentatives de paiement
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Une ligne de commande : « 2 × Baye Sonhibou, Formule 1, Bleu nuit ».
+// Le nom, le prix et le coût sont COPIÉS au moment de l'achat : si le prix
+// d'une formule change demain, cette commande garde le prix réellement payé.
+model OrderItem {
+  id String @id @default(cuid())
+
+  // Si la commande est supprimée, ses lignes le sont aussi.
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  // Liens vers le catalogue. Restrict : impossible de supprimer un modèle déjà vendu
+  // (on le désactive à la place), sinon l'historique perdrait ses références.
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  formulaId String
+  formula   Formula @relation(fields: [formulaId], references: [id], onDelete: Restrict)
+
+  // La « photo » de la vente, figée
+  productName   String
+  formulaName   String
+  color         String
+  quantity      Int
+  unitPriceFcfa Int // prix payé par pièce
+  unitCostFcfa  Int // coût par pièce à ce moment-là, pour calculer le bénéfice
+}
+
+// Une tentative de paiement. Une commande peut en avoir plusieurs :
+// le client essaie Wave, ça échoue, il réessaie, ça marche.
+model Payment {
+  id String @id @default(cuid())
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  method     PaymentMethod
+  provider   String // qui traite le paiement : « DEMO » pour l'instant, le vrai prestataire plus tard
+  amountFcfa Int
+  status     PaymentStatus @default(PENDING)
+
+  // Le numéro que le prestataire donne à ce paiement. Son webhook nous le renverra :
+  // c'est ainsi qu'on retrouvera le bon paiement. @unique : un même avis ne compte qu'une fois.
+  providerReference String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

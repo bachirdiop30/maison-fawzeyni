@@ -114,3 +114,8 @@ export function setQuantity(key: string, quantity: number) {
 export function removeFromCart(key: string) {
   write(read().filter((line) => line.key !== key));
 }
+
+// Vide le panier : appelé une fois la commande enregistrée.
+export function clearCart() {
+  write([]);
+}
