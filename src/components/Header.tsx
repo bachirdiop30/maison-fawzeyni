@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { type ComponentProps, Suspense, useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { mainNav, site } from "@/config/site";
+import { cartCount, useCart } from "@/lib/cart";
 import { whatsappLink } from "@/lib/whatsapp";
 
 export function Header() {
@@ -52,6 +53,7 @@ export function Header() {
           <span className="text-[0.8rem] font-medium tracking-[0.22em] sm:text-sm">MAISON FAWZEYNI</span>
         </Link>
 
+        <div className="flex items-center gap-1 md:gap-8">
         {/* Ordinateur et tablette : les liens sont visibles */}
         <nav aria-label="Menu principal" className="hidden items-center gap-8 md:flex">
           {mainNav.map((link) => (
@@ -72,6 +74,8 @@ export function Header() {
             Contact
           </a>
         </nav>
+
+        <CartLink onClick={closeMenu} />
 
         {/* Téléphone : un bouton ouvre le menu plein écran */}
         <button
@@ -96,6 +100,7 @@ export function Header() {
             />
           </span>
         </button>
+        </div>
       </div>
 
       {/* Le menu plein écran du téléphone */}
@@ -158,4 +163,31 @@ function ActiveLink(props: NavLinkProps) {
   const pathname = usePathname();
   const active = pathname === props.href || pathname.startsWith(`${props.href}/`);
   return <Link {...props} aria-current={active ? "page" : undefined} />;
+}
+
+// Le lien vers le panier, avec le nombre d'articles dans une pastille or.
+function CartLink({ onClick }: { onClick: () => void }) {
+  const lines = useCart();
+  const count = lines ? cartCount(lines) : 0;
+
+  return (
+    <Link
+      href="/panier"
+      onClick={onClick}
+      aria-label={count > 0 ? `Panier, ${count} article${count > 1 ? "s" : ""}` : "Panier"}
+      className="relative z-50 flex min-h-11 items-center gap-2 px-2 text-white/85 transition-colors hover:text-or focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-or"
+    >
+      Panier
+      {count > 0 && (
+        // `key` : la pastille rejoue sa petite animation à chaque ajout.
+        <span
+          key={count}
+          aria-hidden
+          className="flex size-5 animate-prix items-center justify-center rounded-full bg-or text-xs font-semibold text-nuit tabular-nums"
+        >
+          {count}
+        </span>
+      )}
+    </Link>
+  );
 }

@@ -1,31 +1,49 @@
-// Le choix du client sur la fiche d'un modèle : formule, couleur, puis commande.
+// Le choix du client sur la fiche d'un modèle : formule, couleur, puis ajout au panier.
 // C'est un composant client : il réagit aux clics sans recharger la page.
-//
-// Provisoire : en attendant le panier (prochaine étape), le bouton ouvre WhatsApp
-// avec un message déjà rempli. C'est une vraie commande, pas une fausse fonctionnalité.
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { site } from "@/config/site";
+import { addToCart } from "@/lib/cart";
 import { swatchFor } from "@/lib/colors";
 import { formatFcfa } from "@/lib/money";
 import { whatsappLink } from "@/lib/whatsapp";
 import type { ProductDetail } from "@/server/catalogue";
 
-type ProductOptionsProps = Pick<ProductDetail, "name" | "formulas" | "colors">;
+type ProductOptionsProps = Pick<ProductDetail, "slug" | "name" | "formulas" | "colors"> & {
+  image: string | null; // la photo montrée dans le panier
+};
 
-export function ProductOptions({ name, formulas, colors }: ProductOptionsProps) {
+export function ProductOptions({ slug, name, formulas, colors, image }: ProductOptionsProps) {
   const [formulaId, setFormulaId] = useState(formulas[0].id);
   const [color, setColor] = useState(colors[0] ?? "");
+  const [added, setAdded] = useState(false); // vrai pendant quelques secondes après l'ajout
 
   const formula = formulas.find((f) => f.id === formulaId) ?? formulas[0];
   const price = formatFcfa(formula.priceFcfa);
 
-  const message = [
-    "Bonjour MaisonFawzeyni,",
-    `je souhaite commander le ${name} — ${formula.name} (${price})${color ? `, couleur ${color}` : ""}.`,
-  ].join(" ");
-  const orderLink = whatsappLink(site.whatsapp, message);
+  // Le message « ajouté » disparaît tout seul après 4 secondes.
+  useEffect(() => {
+    if (!added) return;
+    const timer = setTimeout(() => setAdded(false), 4000);
+    return () => clearTimeout(timer);
+  }, [added]);
+
+  function handleAdd() {
+    addToCart({
+      slug,
+      name,
+      formulaId: formula.id,
+      formulaName: formula.name,
+      color,
+      priceFcfa: formula.priceFcfa,
+      image,
+    });
+    setAdded(true);
+  }
+
+  const questionLink = whatsappLink(site.whatsapp, `Bonjour MaisonFawzeyni, j'ai une question sur le ${name}.`);
 
   return (
     <div>
@@ -101,8 +119,29 @@ export function ProductOptions({ name, formulas, colors }: ProductOptionsProps) 
         mesures (ou votre taille habituelle) sur WhatsApp.
       </p>
 
-      <a href={orderLink} target="_blank" rel="noopener noreferrer" className={`mt-6 hidden w-full lg:flex ${orderClass}`}>
-        Commander sur WhatsApp
+      <button type="button" onClick={handleAdd} className={`mt-6 hidden w-full lg:flex ${orderClass}`}>
+        Ajouter au panier
+      </button>
+
+      {/* Confirmation discrète, lue aussi par les lecteurs d'écran (aria-live). */}
+      <p aria-live="polite" className="mt-4 min-h-6 text-sm">
+        {added && (
+          <span className="flex animate-prix flex-wrap items-center gap-x-3 text-encre">
+            <span>✓ Ajouté au panier</span>
+            <Link href="/panier" className="text-bleu underline underline-offset-4 hover:text-nuit">
+              Voir le panier
+            </Link>
+          </span>
+        )}
+      </p>
+
+      <a
+        href={questionLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-sm text-gris underline decoration-gris/30 underline-offset-4 transition-colors hover:text-bleu hover:decoration-bleu"
+      >
+        Une question avant de commander ? Écrivez-nous sur WhatsApp
       </a>
 
       {/* Sur téléphone : le prix et le bouton restent toujours accessibles en bas de l'écran. */}
@@ -111,14 +150,14 @@ export function ProductOptions({ name, formulas, colors }: ProductOptionsProps) 
           <span className="block text-gris">{formula.name}</span>
           <span className="font-semibold text-bleu">{price}</span>
         </p>
-        <a href={orderLink} target="_blank" rel="noopener noreferrer" className={`flex flex-1 ${orderClass}`}>
-          Commander
-        </a>
+        <button type="button" onClick={handleAdd} className={`flex flex-1 ${orderClass}`}>
+          {added ? "✓ Ajouté" : "Ajouter au panier"}
+        </button>
       </div>
     </div>
   );
 }
 
-// Même style que le bouton « primary » (components/Button.tsx), pour un lien externe.
+// Même style que le bouton « primary » (components/Button.tsx), en un peu plus haut.
 const orderClass =
   "min-h-12 items-center justify-center bg-bleu px-6 text-[0.95rem] font-medium tracking-wide text-white transition-colors hover:bg-nuit focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-bleu";

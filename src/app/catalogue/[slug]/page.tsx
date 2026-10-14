@@ -51,7 +51,13 @@ async function ProductView({ params }: { params: Promise<{ slug: string }> }) {
           <h1 className="mt-4 font-display text-4xl leading-tight text-bleu sm:text-5xl">{product.name}</h1>
           <p className="mt-5 leading-relaxed text-gris">{product.description}</p>
 
-          <ProductOptions name={product.name} formulas={product.formulas} colors={product.colors} />
+          <ProductOptions
+            slug={product.slug}
+            name={product.name}
+            formulas={product.formulas}
+            colors={product.colors}
+            image={product.images[0]?.url ?? null}
+          />
 
           <dl className="mt-10 divide-y divide-encre/10 border-y border-encre/10 text-sm">
             <div className="flex justify-between gap-6 py-3">
