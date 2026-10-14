@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Button } from "@/components/Button";
+import { PayButton } from "@/components/payment/PayButton";
 import { formatFcfa } from "@/lib/money";
 import { formatOrderNumber, getOrderConfirmation } from "@/server/orders";
 
@@ -38,10 +39,34 @@ async function Confirmation({ params }: { params: Promise<{ id: string }> }) {
       <h1 className="mt-4 font-display text-4xl leading-tight text-bleu sm:text-5xl">
         Merci, {order.customer.firstName}.
       </h1>
-      <p className="mt-5 leading-relaxed text-gris">
-        Votre commande est enregistrée. Nous vous contactons sur WhatsApp au +{order.customer.phone} pour prendre vos
-        mesures et confirmer la livraison.
-      </p>
+
+      {/* Ce bloc dépend du statut ENREGISTRÉ EN BASE, mis à jour uniquement par les webhooks. */}
+      {order.paymentStatus === "PAID" && (
+        <p className="mt-5 leading-relaxed text-gris">
+          <span className="font-medium text-emerald-800">✓ Paiement confirmé.</span> Nous vous contactons sur WhatsApp
+          au +{order.customer.phone} pour prendre vos mesures et organiser la livraison.
+        </p>
+      )}
+      {order.paymentStatus === "PENDING" && (
+        <div className="mt-5">
+          <p className="leading-relaxed text-gris">
+            Votre commande est enregistrée. Il reste à la régler pour lancer la confection.
+          </p>
+          <div className="mt-6">
+            <PayButton orderId={id} label={`Payer ${formatFcfa(order.totalFcfa)} avec ${paymentLabels[order.paymentMethod]}`} />
+          </div>
+        </div>
+      )}
+      {order.paymentStatus === "FAILED" && (
+        <div className="mt-5">
+          <p className="leading-relaxed text-red-800">
+            Le paiement n&apos;a pas abouti. Votre commande est conservée : vous pouvez réessayer.
+          </p>
+          <div className="mt-6">
+            <PayButton orderId={id} label="Réessayer le paiement" />
+          </div>
+        </div>
+      )}
 
       <ul className="mt-10 divide-y divide-encre/10 border-y border-encre/10">
         {order.items.map((item) => (

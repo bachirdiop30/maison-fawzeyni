@@ -2,7 +2,7 @@
 // Composant client : il lit le panier (stocké dans le navigateur) et l'envoie à l'API.
 //
 // Le parcours : le visiteur remplit → POST /api/orders → le serveur vérifie et enregistre
-// → on vide le panier → on affiche la page de confirmation.
+// → on vide le panier → POST /api/payments → page de paiement du prestataire (DÉMO pour l'instant).
 "use client";
 
 import Link from "next/link";
@@ -72,9 +72,21 @@ export function CheckoutForm() {
         return;
       }
 
+      // La commande est enregistrée : on vide le panier, puis on ouvre directement le paiement.
+      // Si le paiement ne démarre pas, le client arrive sur sa commande, où il pourra réessayer.
       setDone(true);
       clearCart();
-      router.push(`/commande/${data.id}`);
+      const payment = await fetch("/api/payments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: data.id }),
+      }).catch(() => null);
+      const paymentData = payment?.ok ? await payment.json() : null;
+      if (paymentData?.redirectUrl) {
+        window.location.assign(paymentData.redirectUrl);
+      } else {
+        router.push(`/commande/${data.id}`);
+      }
     } catch {
       setError("Connexion impossible. Vérifiez votre connexion internet et réessayez.");
       setPending(false);
