@@ -1,6 +1,13 @@
 @import "tailwindcss";
 
 /*
+  Survol : par défaut, Tailwind ne l'active que si le navigateur affirme qu'on utilise une souris.
+  Sur les ordinateurs à écran tactile, Windows et le navigateur l'affirment rarement : le survol
+  disparaissait. On l'active donc dès que le pointeur passe sur l'élément, sans condition.
+*/
+@custom-variant hover (&:hover);
+
+/*
   Design system MaisonFawzeyni.
   Chaque variable déclarée ici crée automatiquement des classes Tailwind :
   --color-bleu → bg-bleu, text-bleu, border-bleu…   --font-display → font-display
@@ -27,6 +34,32 @@
 
   /* Animations (déclenchées seulement par une action du visiteur) */
   --animate-menu-in: menu-in 0.45s ease-out both;
+  --animate-fondu: fondu 0.35s ease-out both; /* ouverture des photos en plein écran */
+  --animate-prix: menu-in 0.35s ease-out both; /* le prix change quand on choisit une formule */
+
+  /* La seule animation d'entrée du site : le tissu du hero se dévoile, puis le texte apparaît */
+  --animate-hero-tissu: hero-tissu 1.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-hero-texte: hero-texte 1s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both;
+
+  @keyframes hero-tissu {
+    from {
+      opacity: 0.35; /* pas 0 : le navigateur doit voir l'image tout de suite pour mesurer la vitesse */
+      transform: scale(1.08);
+    }
+  }
+
+  @keyframes hero-texte {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+  }
+
+  @keyframes fondu {
+    from {
+      opacity: 0;
+    }
+  }
 
   @keyframes menu-in {
     from {
@@ -45,6 +78,11 @@
 body {
   background-color: white;
   color: var(--color-encre);
+}
+
+/* Pendant que les photos sont en plein écran, la page derrière ne défile pas. */
+html:has(dialog[open]) {
+  overflow: hidden;
 }
 
 /* Les personnes qui ont réduit les animations dans les réglages de leur téléphone n'en ont aucune. */

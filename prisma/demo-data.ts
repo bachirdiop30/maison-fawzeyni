@@ -9,7 +9,7 @@
 //
 // Photos : Unsplash (licence gratuite, usage commercial autorisé), en attendant le shooting.
 // - Bruno Ngarukiye : baye-sonhibou-1, turki-njaareem-1 et 2, njitlay-1 et 2, baye-lahad-1 et 2
-// - cecil yang : baye-sonhibou-2 (tissu bleu nuit)
+// - cecil yang : baye-sonhibou-2 (tissu bleu nuit, plus utilisée)
 // - Kateryna Hliznitsova : turki-njaareem-3 (tissu bleu nuit)
 
 export type DemoProduct = {
@@ -51,8 +51,9 @@ export const demoProducts: DemoProduct[] = [
       },
     ],
     images: [
+      // Une seule photo de démo : la carte reste fixe au survol.
+      // Les vraies photos (Instagram) ajouteront une 2e vue portée.
       { url: "/images/produits/baye-sonhibou-1.jpg", alt: "Baye Sonhibou gris porté, vue de face" },
-      { url: "/images/produits/baye-sonhibou-2.jpg", alt: "Détail d'un tissu bleu nuit au reflet satiné" },
     ],
   },
   {

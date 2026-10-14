@@ -5,13 +5,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { type ComponentProps, Suspense, useEffect, useState } from "react";
 import { Logo } from "@/components/Logo";
 import { mainNav, site } from "@/config/site";
 import { whatsappLink } from "@/lib/whatsapp";
 
 export function Header() {
-  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -56,14 +55,13 @@ export function Header() {
         {/* Ordinateur et tablette : les liens sont visibles */}
         <nav aria-label="Menu principal" className="hidden items-center gap-8 md:flex">
           {mainNav.map((link) => (
-            <Link
+            <NavLink
               key={link.href}
               href={link.href}
-              aria-current={pathname === link.href ? "page" : undefined}
               className="py-2 text-white/85 transition-colors hover:text-or focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-or aria-[current=page]:text-or"
             >
               {link.label}
-            </Link>
+            </NavLink>
           ))}
           <a
             href={whatsappLink(site.whatsapp)}
@@ -108,15 +106,14 @@ export function Header() {
       >
         <nav aria-label="Menu principal" className="flex flex-col gap-2">
           {mainNav.map((link) => (
-            <Link
+            <NavLink
               key={link.href}
               href={link.href}
               onClick={closeMenu}
-              aria-current={pathname === link.href ? "page" : undefined}
               className="animate-menu-in py-2 font-display text-4xl text-white focus-visible:outline-2 focus-visible:outline-or aria-[current=page]:text-or"
             >
               {link.label}
-            </Link>
+            </NavLink>
           ))}
         </nav>
 
@@ -142,4 +139,23 @@ export function Header() {
       </div>
     </header>
   );
+}
+
+// Un lien du menu, en or quand on est sur sa page (ou une page en dessous : /catalogue/baye-sonhibou).
+// L'adresse de la page n'est connue qu'au moment de la visite : <Suspense> laisse Next préparer
+// l'en-tête à l'avance avec un lien simple, puis la couleur s'ajoute dans le navigateur.
+type NavLinkProps = ComponentProps<typeof Link> & { href: string };
+
+function NavLink(props: NavLinkProps) {
+  return (
+    <Suspense fallback={<Link {...props} />}>
+      <ActiveLink {...props} />
+    </Suspense>
+  );
+}
+
+function ActiveLink(props: NavLinkProps) {
+  const pathname = usePathname();
+  const active = pathname === props.href || pathname.startsWith(`${props.href}/`);
+  return <Link {...props} aria-current={active ? "page" : undefined} />;
 }
