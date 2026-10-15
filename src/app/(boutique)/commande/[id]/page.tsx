@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { Button } from "@/components/Button";
 import { PayButton } from "@/components/payment/PayButton";
 import { formatFcfa } from "@/lib/money";
+import { paymentMethodLabels, paymentStatusLabels } from "@/lib/order-display";
 import { formatOrderNumber, getOrderConfirmation } from "@/server/orders";
 
 export const metadata: Metadata = {
@@ -13,8 +14,8 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-const paymentLabels = { WAVE: "Wave", ORANGE_MONEY: "Orange Money" } as const;
-const statusLabels = { PENDING: "En attente", PAID: "Payé", FAILED: "Échoué" } as const;
+const paymentLabels = paymentMethodLabels;
+const statusLabels = paymentStatusLabels;
 
 export default function ConfirmationPage(props: PageProps<"/commande/[id]">) {
   return (
