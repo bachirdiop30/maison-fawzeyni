@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Bodoni_Moda, Jost } from "next/font/google";
-import { Footer } from "@/components/Footer";
-import { Header } from "@/components/Header";
 import { site } from "@/config/site";
 import "./globals.css";
 
@@ -25,14 +23,13 @@ export const metadata: Metadata = {
   description: site.description,
 };
 
-// Le cadre commun à toutes les pages : chaque page s'affiche à la place de {children}.
+// Le cadre commun à TOUT le site : polices, langue, couleurs de base.
+// La boutique (dossier « (boutique) ») et l'admin (dossier « admin ») ajoutent chacune leur propre cadre.
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang={site.locale} className={`${jost.variable} ${bodoni.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col font-sans">
-        <Header />
         {children}
-        <Footer />
       </body>
     </html>
   );

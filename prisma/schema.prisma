@@ -195,3 +195,45 @@ model Payment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// ─────────────────────────────────────────────────────────────
+// Administration
+// ─────────────────────────────────────────────────────────────
+
+// Une personne autorisée à entrer dans l'espace admin (le gérant).
+// Les clients n'ont pas de compte : seuls les gérants sont dans ce tableau.
+// Création : `npm run admin:creer` (jamais depuis le site).
+model User {
+  id    String @id @default(cuid())
+  email String @unique
+  name  String
+
+  // Le mot de passe n'est JAMAIS enregistré tel quel, seulement son « empreinte » (scrypt).
+  // Même quelqu'un qui lirait la base ne pourrait pas retrouver le mot de passe.
+  passwordHash String
+
+  // Protection contre ceux qui essaient des mots de passe au hasard :
+  // après 5 erreurs, le compte est bloqué 15 minutes.
+  failedLogins Int       @default(0)
+  lockedUntil  DateTime?
+
+  sessions Session[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Une connexion en cours (un « badge » valable 7 jours).
+// Le navigateur garde le badge dans un cookie ; la base n'en garde que l'empreinte.
+// Se déconnecter = supprimer la ligne : le badge ne vaut plus rien.
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique // empreinte SHA-256 du badge
+  expiresAt DateTime
+
+  // Si le gérant est supprimé, ses connexions le sont aussi.
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
