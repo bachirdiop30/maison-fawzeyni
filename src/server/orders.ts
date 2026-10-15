@@ -116,9 +116,7 @@ export async function createOrder(input: z.output<typeof orderInputSchema>) {
 }
 
 // Le numéro affiché au client : 7 → « MF-0007 ».
-export function formatOrderNumber(number: number): string {
-  return `MF-${String(number).padStart(4, "0")}`;
-}
+export { formatOrderNumber } from "@/lib/order-display";
 
 // Ce que la page de confirmation a le droit de montrer au client. Sans aucun coût.
 export async function getOrderConfirmation(id: string) {
